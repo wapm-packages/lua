@@ -52,12 +52,12 @@ TESTS= -DLUA_USER_H='"ltests.h"' -O0
 
 
 # enable Linux goodies
-MYCFLAGS= $(LOCAL) -std=c99 -DLUA_USE_LINUX -DLUA_USE_READLINE
-MYLDFLAGS= $(LOCAL) -Wl,-E
+MYCFLAGS= $(LOCAL) -DLUA_USE_LINUX
+MYLDFLAGS= $(LOCAL) -Wl
 MYLIBS= -ldl -lreadline
 
 
-CC= gcc
+CC=em++
 CFLAGS= -Wall -O2 $(MYCFLAGS) -Wfatal-errors -fno-stack-protector -fno-common
 AR= ar rc
 RANLIB= ranlib
@@ -78,7 +78,7 @@ AUX_O=	lauxlib.o
 LIB_O=	lbaselib.o ldblib.o liolib.o lmathlib.o loslib.o ltablib.o lstrlib.o \
 	lutf8lib.o loadlib.o lcorolib.o linit.o
 
-LUA_T=	lua
+LUA_T=	lua.js
 LUA_O=	lua.o
 
 # LUAC_T=	luac
@@ -99,7 +99,7 @@ $(CORE_T): $(CORE_O) $(AUX_O) $(LIB_O)
 	$(RANLIB) $@
 
 $(LUA_T): $(LUA_O) $(CORE_T)
-	$(CC) -o $@ $(MYLDFLAGS) $(LUA_O) $(CORE_T) $(LIBS) $(MYLIBS) $(DL)
+	$(CC) -o $@ $(MYLDFLAGS) $(LUA_O) $(CORE_T) $(LIBS) $(MYLIBS) $(DL) -s WASM=1 -s ERROR_ON_UNDEFINED_SYMBOLS=0
 
 $(LUAC_T): $(LUAC_O) $(CORE_T)
 	$(CC) -o $@ $(MYLDFLAGS) $(LUAC_O) $(CORE_T) $(LIBS) $(MYLIBS)
