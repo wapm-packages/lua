@@ -12,6 +12,7 @@
 
 #include <setjmp.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "lua.h"
@@ -136,15 +137,21 @@ l_noret luaD_throw (lua_State *L, int errcode) {
 int luaD_rawrunprotected (lua_State *L, Pfunc f, void *ud) {
   unsigned short oldnCcalls = L->nCcalls - L->nci;
   struct lua_longjmp lj;
+  printf("luaD_rawrunprotected::lua_assert\n");
   lua_assert(L->nCcalls >= L->nci);
+  printf("luaD_rawrunprotected::lj\n");
   lj.status = LUA_OK;
   lj.previous = L->errorJmp;  /* chain new error handler */
+  printf("luaD_rawrunprotected::errorJmp\n");
   L->errorJmp = &lj;
+  printf("luaD_rawrunprotected::LUAI_TRY\n");
   LUAI_TRY(L, &lj,
     (*f)(L, ud);
   );
+  printf("luaD_rawrunprotected::L\n");
   L->errorJmp = lj.previous;  /* restore old error handler */
   L->nCcalls = oldnCcalls + L->nci;
+  printf("luaD_rawrunprotected::end\n");
   return lj.status;
 }
 
@@ -746,23 +753,32 @@ LUA_API int lua_yieldk (lua_State *L, int nresults, lua_KContext ctx,
 int luaD_pcall (lua_State *L, Pfunc func, void *u,
                 ptrdiff_t old_top, ptrdiff_t ef) {
   int status;
+  printf("luaD_pcall::init\n");
   CallInfo *old_ci = L->ci;
   lu_byte old_allowhooks = L->allowhook;
   unsigned short old_nny = L->nny;
   ptrdiff_t old_errfunc = L->errfunc;
   L->errfunc = ef;
+  printf("luaD_pcall::luaD_rawrunprotected\n");
   status = luaD_rawrunprotected(L, func, u);
+  printf("luaD_pcall::unlikely\n");
   if (unlikely(status != LUA_OK)) {  /* an error occurred? */
+    printf("luaD_pcall::restorestack\n");
     StkId oldtop = restorestack(L, old_top);
     L->ci = old_ci;
     L->allowhook = old_allowhooks;
     L->nny = old_nny;
+    printf("luaD_pcall::luaF_close\n");
     status = luaF_close(L, oldtop, status);
+    printf("luaD_pcall::restorestack\n");
     oldtop = restorestack(L, old_top);  /* previous call may change stack */
+    printf("luaD_pcall::luaD_seterrorobj\n");
     luaD_seterrorobj(L, status, oldtop);
+    printf("luaD_pcall::luaD_shrinkstack\n");
     luaD_shrinkstack(L);
   }
   L->errfunc = old_errfunc;
+  printf("luaD_pcall::end\n");
   return status;
 }
 
@@ -810,18 +826,29 @@ int luaD_protectedparser (lua_State *L, ZIO *z, const char *name,
                                         const char *mode) {
   struct SParser p;
   int status;
+  ptrdiff_t func;
   L->nny++;  /* cannot yield during parsing */
   p.z = z; p.name = name; p.mode = mode;
   p.dyd.actvar.arr = NULL; p.dyd.actvar.size = 0;
   p.dyd.gt.arr = NULL; p.dyd.gt.size = 0;
   p.dyd.label.arr = NULL; p.dyd.label.size = 0;
+  printf("luaD_protectedparser::luaZ_initbuffer\n");
   luaZ_initbuffer(L, &p.buff);
-  status = luaD_pcall(L, f_parser, &p, savestack(L, L->top), L->errfunc);
+  printf("luaD_protectedparser::savestack\n");
+  func = savestack(L, L->top);
+  printf("luaD_protectedparser::luaD_pcall\n");
+  status = luaD_pcall(L, f_parser, &p, func, L->errfunc);
+  printf("luaD_protectedparser::luaZ_freebuffer\n");
   luaZ_freebuffer(L, &p.buff);
+  printf("luaD_protectedparser::luaM_freearray\n");
   luaM_freearray(L, p.dyd.actvar.arr, p.dyd.actvar.size);
+  printf("luaD_protectedparser::luaM_freearray\n");
   luaM_freearray(L, p.dyd.gt.arr, p.dyd.gt.size);
+  printf("luaD_protectedparser::luaM_freearray\n");
   luaM_freearray(L, p.dyd.label.arr, p.dyd.label.size);
+  printf("luaD_protectedparser::decref\n");
   L->nny--;
+  printf("luaD_protectedparser::end\n");
   return status;
 }
 

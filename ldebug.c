@@ -12,6 +12,7 @@
 
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "lua.h"
@@ -246,6 +247,7 @@ LUA_API const char *lua_getlocal (lua_State *L, const lua_Debug *ar, int n) {
 
 
 LUA_API const char *lua_setlocal (lua_State *L, const lua_Debug *ar, int n) {
+  printf("SETLOCAL\n");
   StkId pos = NULL;  /* to avoid warnings */
   const char *name;
   lua_lock(L);

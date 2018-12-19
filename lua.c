@@ -465,16 +465,27 @@ static int pushline (lua_State *L, int firstline) {
 ** has either compiled chunk or original line (if compilation failed).
 */
 static int addreturn (lua_State *L) {
+  printf("addreturn\n");
   const char *line = lua_tostring(L, -1);  /* original line */
+  printf("addreturn:lua_pushfstring\n");
   const char *retline = lua_pushfstring(L, "return %s;", line);
+  printf("addreturn:luaL_loadbuffer\n");
   int status = luaL_loadbuffer(L, retline, strlen(retline), "=stdin");
+    printf("addreturn:status\n");
   if (status == LUA_OK) {
+    printf("addreturn:lua_remove\n");
     lua_remove(L, -2);  /* remove modified line */
-    if (line[0] != '\0')  /* non empty? */
+    if (line[0] != '\0')  { /* non empty? */
+      printf("addreturn:lua_saveline\n");
       lua_saveline(L, line);  /* keep history */
+    }
   }
-  else
+  else {
+    printf("addreturn:lua_pop\n");
     lua_pop(L, 2);  /* pop result from 'luaL_loadbuffer' and modified line */
+  }
+  printf("addreturn:end\n");
+
   return status;
 }
 
@@ -506,13 +517,22 @@ static int multiline (lua_State *L) {
 */
 static int loadline (lua_State *L) {
   int status;
+  printf("loadline\n");
   lua_settop(L, 0);
+  printf("loadline::pushline\n");
   if (!pushline(L, 1))
     return -1;  /* no input */
-  if ((status = addreturn(L)) != LUA_OK)  /* 'return ...' did not work? */
+  printf("loadline::addreturn\n");
+  if ((status = addreturn(L)) != LUA_OK)  {
+    /* 'return ...' did not work? */
+    printf("loadline::multiline\n");
     status = multiline(L);  /* try as command, maybe with continuation lines */
+  }
+  printf("loadline::remove\n");
   lua_remove(L, 1);  /* remove line from the stack */
+  printf("loadline::assert\n");
   lua_assert(lua_gettop(L) == 1);
+  printf("loadline::end\n");
   return status;
 }
 
