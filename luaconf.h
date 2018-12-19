@@ -51,6 +51,8 @@
 #define LUA_USE_WINDOWS  /* enable goodies for regular Windows */
 #endif
 
+#define LUA_USE_LONGJMP
+#define LUA_32BITS
 
 #if defined(LUA_USE_WINDOWS)
 #define LUA_DL_DLL	/* enable support for DLL */
@@ -112,6 +114,7 @@
 #define LUA_FLOAT_FLOAT		1
 #define LUA_FLOAT_DOUBLE	2
 #define LUA_FLOAT_LONGDOUBLE	3
+
 
 #if defined(LUA_32BITS)		/* { */
 /*

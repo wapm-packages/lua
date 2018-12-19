@@ -57,7 +57,7 @@ MYLDFLAGS= $(LOCAL) -Wl
 MYLIBS= -ldl -lreadline
 
 
-CC=em++
+CC=emcc
 CFLAGS= -Wall -O2 $(MYCFLAGS) -Wfatal-errors -fno-stack-protector -fno-common
 AR= ar rc
 RANLIB= ranlib
