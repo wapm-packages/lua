@@ -52,13 +52,13 @@ TESTS= -DLUA_USER_H='"ltests.h"' -O0
 
 
 # enable Linux goodies
-MYCFLAGS= $(LOCAL) -DLUA_USE_LINUX
+MYCFLAGS= $(LOCAL)
 MYLDFLAGS= $(LOCAL) -Wl
 MYLIBS= -ldl -lreadline
 
 
-CC=em++
-CFLAGS= -Wall -O2 $(MYCFLAGS) -Wfatal-errors -fno-stack-protector -fno-common
+CC=emcc
+CFLAGS= -Wall -O3 -g2 $(MYCFLAGS) -Wfatal-errors -fno-stack-protector -fno-common
 AR= ar rc
 RANLIB= ranlib
 RM= rm -f
