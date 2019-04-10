@@ -1,0 +1,11 @@
+[module]
+name = "lua"
+version = "0.1.0"
+description = "Lua is a lightweight, multi-paradigm programming language designed primarily for embedded use in applications"
+readme = "README.md"
+module = "lua.wasm"
+repository = "https://github.com/wapm-packages/lua"
+abi = "Emscripten"
+
+[[command]]
+name = "lua"

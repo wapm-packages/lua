@@ -1,3 +1,5 @@
 *.o
 *.a
-/lua
+.vscode
+lua/all
+lua/bugs
