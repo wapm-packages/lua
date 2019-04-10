@@ -13,7 +13,6 @@
 #include <limits.h>
 #include <stdarg.h>
 #include <string.h>
-#include <stdio.h>
 
 #include "lua.h"
 
@@ -1034,32 +1033,22 @@ LUA_API int lua_load (lua_State *L, lua_Reader reader, void *data,
                       const char *chunkname, const char *mode) {
   ZIO z;
   int status;
-  printf("lua_load::init\n");
   lua_lock(L);
   if (!chunkname) chunkname = "?";
-  printf("lua_load::luaZ_init\n");
   luaZ_init(L, &z, reader, data);
-  printf("lua_load::luaD_protectedparser\n");
   status = luaD_protectedparser(L, &z, chunkname, mode);
   if (status == LUA_OK) {  /* no errors? */
-    printf("lua_load::clLvalue\n");
     LClosure *f = clLvalue(s2v(L->top - 1));  /* get newly created function */
     if (f->nupvalues >= 1) {  /* does it have an upvalue? */
       /* get global table from registry */
-      printf("lua_load::hvalue\n");
       Table *reg = hvalue(&G(L)->l_registry);
-      printf("lua_load::luaH_getint\n");
       const TValue *gt = luaH_getint(reg, LUA_RIDX_GLOBALS);
       /* set global table as 1st upvalue of 'f' (may be LUA_ENV) */
-      printf("lua_load::setobj\n");
       setobj(L, f->upvals[0]->v, gt);
-      printf("lua_load::luaC_barrier\n");
       luaC_barrier(L, f->upvals[0], gt);
     }
   }
-  printf("lua_load::lua_unlock\n");
   lua_unlock(L);
-  printf("lua_load::end\n");
   return status;
 }
 
