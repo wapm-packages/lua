@@ -1,6 +1,6 @@
 [package]
 name = "lua"
-version = "0.1.3"
+version = "0.1.4"
 description = "Lua is a lightweight, multi-paradigm programming language designed primarily for embedded use in applications"
 readme = "README.md"
 repository = "https://github.com/wapm-packages/lua"
@@ -8,7 +8,7 @@ repository = "https://github.com/wapm-packages/lua"
 [[module]]
 name = "lua"
 source = "lua.wasm"
-abi = "Emscripten"
+abi = "emscripten"
 
 [[command]]
 name = "lua"
