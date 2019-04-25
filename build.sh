@@ -1,4 +1,4 @@
-# Download and compile sqlite3 to web assembly
+# Download and compile lua to web assembly
 cd lua
 
 echo "Build"
